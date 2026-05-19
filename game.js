@@ -132,7 +132,7 @@
         bullets: [],
         explosions: [],
         powerUps: [],
-        map: [],
+        map: Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0)),
         spawnPoints: [],
         playerSpawnPoint: null,
         basePos: null,
@@ -981,8 +981,10 @@
     // ===== 渲染地图 =====
     function drawMap() {
         for (let row = 0; row < GRID_SIZE; row++) {
+            const rowData = game.map[row];
+            if (!rowData) continue;
             for (let col = 0; col < GRID_SIZE; col++) {
-                const tile = game.map[row][col];
+                const tile = rowData[col];
                 const x = col * TILE_SIZE;
                 const y = row * TILE_SIZE;
 
@@ -1080,8 +1082,10 @@
 
     function drawGrassLayer() {
         for (let row = 0; row < GRID_SIZE; row++) {
+            const rowData = game.map[row];
+            if (!rowData) continue;
             for (let col = 0; col < GRID_SIZE; col++) {
-                if (game.map[row][col] === TILE.GRASS) {
+                if (rowData[col] === TILE.GRASS) {
                     drawGrass(col * TILE_SIZE, row * TILE_SIZE);
                 }
             }
@@ -1322,8 +1326,12 @@
     }
 
     function gameLoop() {
-        update();
-        draw();
+        try {
+            update();
+            draw();
+        } catch (err) {
+            console.error('Game loop error:', err);
+        }
         requestAnimationFrame(gameLoop);
     }
 
